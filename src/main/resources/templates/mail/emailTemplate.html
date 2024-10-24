@@ -1,8 +1,259 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Pie Charts with Percentage Inside and Hover for Quantity</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Định dạng phần legend (mô tả) */
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        /* Hiệu ứng khi hover */
+        #hoverText1, #hoverText2, #hoverText3 {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
 <body>
-<h1 th:text="${name}">Name</h1>
-<p style="color: red">This is an email with an inline image:</p>
-<img src="cid:inlineImage" height="200px" width="200px"/>
+
+<h2 class="text-center">Two Pie Charts with Percentage Inside and Hover for Quantity</h2>
+
+<div class="container">
+    <!-- Biểu đồ 1 -->
+    <div>
+        <canvas id="pieChart1" width="300" height="300"></canvas>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #FF6384;"></div>
+                <span>Red (300)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #36A2EB;"></div>
+                <span>Blue (100)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #FFCE56;"></div>
+                <span>Yellow (200)</span>
+            </div>
+        </div>
+        <div id="hoverText1"></div>
+    </div>
+
+    <!-- Biểu đồ 2 -->
+    <div>
+        <canvas id="pieChart2" width="300" height="300"></canvas>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #4BC0C0;"></div>
+                <span>Green (150)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #9966FF;"></div>
+                <span>Purple (80)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #FF9F40;"></div>
+                <span>Orange (120)</span>
+            </div>
+        </div>
+        <div id="hoverText2"></div>
+    </div>
+
+
+    <!-- Biểu đồ 3 -->
+    <div>
+        <canvas id="pieChart3" width="300" height="300"></canvas>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #4BC0C0;"></div>
+                <span>Green (150)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #9966FF;"></div>
+                <span>Purple (80)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #FF9F40;"></div>
+                <span>Orange (120)</span>
+            </div>
+        </div>
+        <div id="hoverText3"></div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu biểu đồ 1
+    var data1 = {
+        labels: ['Red', 'Blue', 'Yellow'],
+        values: [400, 100, 200],
+        colors: ['#FF6384', '#36A2EB', '#FFCE56']
+    };
+
+    // Dữ liệu biểu đồ 2
+    var data2 = {
+        labels: ['Green', 'Purple', 'Orange'],
+        values: [150, 80, 120],
+        colors: ['#4BC0C0', '#9966FF', '#FF9F40']
+    };
+
+
+    // Dữ liệu biểu đồ 3
+    var data3 = {
+        labels: ['Red', 'Blue', 'Yellow'],
+        values: [400, 200, 200],
+        colors: ['#FF6384', '#36A2EB', '#FFCE56']
+    };
+
+    // Hàm vẽ biểu đồ hình tròn
+    function drawPieChart(canvasId, hoverTextId, data) {
+        var canvas = document.getElementById(canvasId);
+        var ctx = canvas.getContext('2d');
+        var total = data.values.reduce((acc, value) => acc + value, 0);
+        var startAngle = 0;
+        var slices = [];
+
+        for (var i = 0; i < data.values.length; i++) {
+            var sliceAngle = (data.values[i] / total) * 2 * Math.PI;
+
+            slices[i] = {
+                startAngle: startAngle,
+                endAngle: startAngle + sliceAngle,
+                color: data.colors[i],
+                percentage: ((data.values[i] / total) * 100).toFixed(2) + '%',
+                value: data.values[i]
+            };
+
+            ctx.beginPath();
+            ctx.moveTo(150, 150);
+            ctx.arc(150, 150, 100, startAngle, startAngle + sliceAngle);
+            ctx.closePath();
+
+            ctx.fillStyle = data.colors[i];
+            ctx.fill();
+
+            startAngle += sliceAngle;
+
+            var textAngle = (slices[i].startAngle + slices[i].endAngle) / 2;
+            var textX = 150 + Math.cos(textAngle) * 60;
+            var textY = 150 + Math.sin(textAngle) * 60;
+            ctx.fillStyle = 'white';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(slices[i].percentage, textX, textY);
+        }
+
+        // Thêm sự kiện hover để xác định vị trí của chuột
+        canvas.addEventListener('mousemove', function(event) {
+            var x = event.offsetX - 150;
+            var y = event.offsetY - 150;
+            var distanceFromCenter = Math.sqrt(x * x + y * y);
+
+            if (distanceFromCenter <= 100) {
+                var angle = Math.atan2(y, x);
+                if (angle < 0) angle += 2 * Math.PI;
+
+                for (var i = 0; i < slices.length; i++) {
+                    if (angle >= slices[i].startAngle && angle <= slices[i].endAngle) {
+                        document.getElementById(hoverTextId).innerText =
+                            data.labels[i] + ": " + slices[i].value;
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        drawPieChartWithoutHover(canvasId, data);
+
+                        ctx.beginPath();
+                        ctx.moveTo(150, 150);
+                        ctx.arc(150, 150, 100, slices[i].startAngle, slices[i].endAngle);
+                        ctx.closePath();
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = slices[i].color;
+                        ctx.stroke();
+                        break;
+                    } else {
+                        document.getElementById(hoverTextId).innerText = '';
+                    }
+                }
+            } else {
+                document.getElementById(hoverTextId).innerText = '';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawPieChartWithoutHover(canvasId, data);
+            }
+        });
+    }
+
+    function drawPieChartWithoutHover(canvasId, data) {
+        var canvas = document.getElementById(canvasId);
+        var ctx = canvas.getContext('2d');
+        var total = data.values.reduce((acc, value) => acc + value, 0);
+        var startAngle = 0;
+        var slices = [];
+
+        for (var i = 0; i < data.values.length; i++) {
+            var sliceAngle = (data.values[i] / total) * 2 * Math.PI;
+
+            slices[i] = {
+                startAngle: startAngle,
+                endAngle: startAngle + sliceAngle,
+                color: data.colors[i],
+                percentage: ((data.values[i] / total) * 100).toFixed(2) + '%',
+                value: data.values[i]
+            };
+
+            ctx.beginPath();
+            ctx.moveTo(150, 150);
+            ctx.arc(150, 150, 100, startAngle, startAngle + sliceAngle);
+            ctx.closePath();
+
+            ctx.fillStyle = data.colors[i];
+            ctx.fill();
+
+            startAngle += sliceAngle;
+
+            var textAngle = (slices[i].startAngle + slices[i].endAngle) / 2;
+            var textX = 150 + Math.cos(textAngle) * 60;
+            var textY = 150 + Math.sin(textAngle) * 60;
+            ctx.fillStyle = 'white';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(slices[i].percentage, textX, textY);
+        }
+    }
+
+    // Vẽ 2 biểu đồ
+    drawPieChart('pieChart1', 'hoverText1', data1);
+    drawPieChart('pieChart2', 'hoverText2', data2);
+    drawPieChart('pieChart3', 'hoverText3', data3);
+</script>
+
 </body>
 </html>
