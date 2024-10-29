@@ -1,259 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Two Pie Charts with Percentage Inside and Hover for Quantity</title>
-    <style>
-        .container {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            margin-top: 20px;
-        }
-
-        canvas {
-            display: block;
-            margin: 0 auto;
-        }
-
-        /* Định dạng phần legend (mô tả) */
-        .legend {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-right: 10px;
-        }
-
-        .color-box {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
-
-        /* Hiệu ứng khi hover */
-        #hoverText1, #hoverText2, #hoverText3 {
-            text-align: center;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-
-<h2 class="text-center">Two Pie Charts with Percentage Inside and Hover for Quantity</h2>
-
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 5 Horizontal Stepper Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+ <main>
 <div class="container">
-    <!-- Biểu đồ 1 -->
-    <div>
-        <canvas id="pieChart1" width="300" height="300"></canvas>
-        <div class="legend">
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #FF6384;"></div>
-                <span>Red (300)</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #36A2EB;"></div>
-                <span>Blue (100)</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #FFCE56;"></div>
-                <span>Yellow (200)</span>
-            </div>
+<div class="steps">
+    <progress id="progress" value=0 max=100 ></progress>
+    <div class="step-item">
+        <button class="step-button text-center" type="button" data-bs-toggle="collapse"
+            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            1
+        </button>
+        <div class="step-title">
+            First Step
         </div>
-        <div id="hoverText1"></div>
     </div>
-
-    <!-- Biểu đồ 2 -->
-    <div>
-        <canvas id="pieChart2" width="300" height="300"></canvas>
-        <div class="legend">
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #4BC0C0;"></div>
-                <span>Green (150)</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #9966FF;"></div>
-                <span>Purple (80)</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #FF9F40;"></div>
-                <span>Orange (120)</span>
-            </div>
+    <div class="step-item">
+        <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            2
+        </button>
+        <div class="step-title">
+            Second Step
         </div>
-        <div id="hoverText2"></div>
     </div>
-
-
-    <!-- Biểu đồ 3 -->
-    <div>
-        <canvas id="pieChart3" width="300" height="300"></canvas>
-        <div class="legend">
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #4BC0C0;"></div>
-                <span>Green (150)</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #9966FF;"></div>
-                <span>Purple (80)</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-box" style="background-color: #FF9F40;"></div>
-                <span>Orange (120)</span>
-            </div>
+    <div class="step-item">
+        <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseThree">
+            3
+        </button>
+        <div class="step-title">
+            Third Step
         </div>
-        <div id="hoverText3"></div>
+    </div>
+    <div class="step-item">
+        <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseFour">
+            4
+        </button>
+        <div class="step-title">
+            Third Step
+        </div>
     </div>
 </div>
+</div>
+         <!-- End Start Stepper HTML -->
+ </main>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
 <script>
-    // Dữ liệu biểu đồ 1
-    var data1 = {
-        labels: ['Red', 'Blue', 'Yellow'],
-        values: [400, 100, 200],
-        colors: ['#FF6384', '#36A2EB', '#FFCE56']
-    };
+const stepButtons = document.querySelectorAll('.step-button');
+const progress = document.querySelector('#progress');
 
-    // Dữ liệu biểu đồ 2
-    var data2 = {
-        labels: ['Green', 'Purple', 'Orange'],
-        values: [150, 80, 120],
-        colors: ['#4BC0C0', '#9966FF', '#FF9F40']
-    };
-
-
-    // Dữ liệu biểu đồ 3
-    var data3 = {
-        labels: ['Red', 'Blue', 'Yellow'],
-        values: [400, 200, 200],
-        colors: ['#FF6384', '#36A2EB', '#FFCE56']
-    };
-
-    // Hàm vẽ biểu đồ hình tròn
-    function drawPieChart(canvasId, hoverTextId, data) {
-        var canvas = document.getElementById(canvasId);
-        var ctx = canvas.getContext('2d');
-        var total = data.values.reduce((acc, value) => acc + value, 0);
-        var startAngle = 0;
-        var slices = [];
-
-        for (var i = 0; i < data.values.length; i++) {
-            var sliceAngle = (data.values[i] / total) * 2 * Math.PI;
-
-            slices[i] = {
-                startAngle: startAngle,
-                endAngle: startAngle + sliceAngle,
-                color: data.colors[i],
-                percentage: ((data.values[i] / total) * 100).toFixed(2) + '%',
-                value: data.values[i]
-            };
-
-            ctx.beginPath();
-            ctx.moveTo(150, 150);
-            ctx.arc(150, 150, 100, startAngle, startAngle + sliceAngle);
-            ctx.closePath();
-
-            ctx.fillStyle = data.colors[i];
-            ctx.fill();
-
-            startAngle += sliceAngle;
-
-            var textAngle = (slices[i].startAngle + slices[i].endAngle) / 2;
-            var textX = 150 + Math.cos(textAngle) * 60;
-            var textY = 150 + Math.sin(textAngle) * 60;
-            ctx.fillStyle = 'white';
-            ctx.font = '14px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(slices[i].percentage, textX, textY);
+// Hàm để thiết lập trạng thái của stepper
+function setInitialStep(stepIndex) {
+    progress.setAttribute('value', stepIndex * 100 / (stepButtons.length - 1));
+    stepButtons.forEach((button, index) => {
+        if (index <= stepIndex) {
+            button.classList.add('done');
+        } else {
+            button.classList.remove('done');
         }
+    });
+}
 
-        // Thêm sự kiện hover để xác định vị trí của chuột
-        canvas.addEventListener('mousemove', function(event) {
-            var x = event.offsetX - 150;
-            var y = event.offsetY - 150;
-            var distanceFromCenter = Math.sqrt(x * x + y * y);
+// Gọi hàm khi trang tải xong
+window.onload = () => {
+    setInitialStep(2); // Bắt đầu ở bước 3 (index 2)
+};
 
-            if (distanceFromCenter <= 100) {
-                var angle = Math.atan2(y, x);
-                if (angle < 0) angle += 2 * Math.PI;
-
-                for (var i = 0; i < slices.length; i++) {
-                    if (angle >= slices[i].startAngle && angle <= slices[i].endAngle) {
-                        document.getElementById(hoverTextId).innerText =
-                            data.labels[i] + ": " + slices[i].value;
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        drawPieChartWithoutHover(canvasId, data);
-
-                        ctx.beginPath();
-                        ctx.moveTo(150, 150);
-                        ctx.arc(150, 150, 100, slices[i].startAngle, slices[i].endAngle);
-                        ctx.closePath();
-                        ctx.lineWidth = 3;
-                        ctx.strokeStyle = slices[i].color;
-                        ctx.stroke();
-                        break;
-                    } else {
-                        document.getElementById(hoverTextId).innerText = '';
-                    }
-                }
-            } else {
-                document.getElementById(hoverTextId).innerText = '';
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawPieChartWithoutHover(canvasId, data);
+Array.from(stepButtons).forEach((button,index) => {
+    button.addEventListener('click', () => {
+        progress.setAttribute('value', index * 100 /(stepButtons.length - 1) );
+        stepButtons.forEach((item, secindex)=>{
+            if(index > secindex){
+                item.classList.add('done');
             }
-        });
-    }
-
-    function drawPieChartWithoutHover(canvasId, data) {
-        var canvas = document.getElementById(canvasId);
-        var ctx = canvas.getContext('2d');
-        var total = data.values.reduce((acc, value) => acc + value, 0);
-        var startAngle = 0;
-        var slices = [];
-
-        for (var i = 0; i < data.values.length; i++) {
-            var sliceAngle = (data.values[i] / total) * 2 * Math.PI;
-
-            slices[i] = {
-                startAngle: startAngle,
-                endAngle: startAngle + sliceAngle,
-                color: data.colors[i],
-                percentage: ((data.values[i] / total) * 100).toFixed(2) + '%',
-                value: data.values[i]
-            };
-
-            ctx.beginPath();
-            ctx.moveTo(150, 150);
-            ctx.arc(150, 150, 100, startAngle, startAngle + sliceAngle);
-            ctx.closePath();
-
-            ctx.fillStyle = data.colors[i];
-            ctx.fill();
-
-            startAngle += sliceAngle;
-
-            var textAngle = (slices[i].startAngle + slices[i].endAngle) / 2;
-            var textX = 150 + Math.cos(textAngle) * 60;
-            var textY = 150 + Math.sin(textAngle) * 60;
-            ctx.fillStyle = 'white';
-            ctx.font = '14px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(slices[i].percentage, textX, textY);
-        }
-    }
-
-    // Vẽ 2 biểu đồ
-    drawPieChart('pieChart1', 'hoverText1', data1);
-    drawPieChart('pieChart2', 'hoverText2', data2);
-    drawPieChart('pieChart3', 'hoverText3', data3);
+            if(index < secindex){
+                item.classList.remove('done');
+            }
+        })
+    })
+})
 </script>
-
-</body>
+  </body>
 </html>
+
+
+:root {
+    --prm-color: #0381ff;
+    --prm-gray: #b1b1b1;
+}
+
+/* CSS */
+.steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.step-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--prm-gray);
+    transition: .4s;
+}
+
+.step-button[aria-expanded="true"] {
+    width: 60px;
+    height: 60px;
+    background-color: var(--prm-color);
+    color: #fff;
+}
+
+.done {
+    background-color: var(--prm-color);
+    color: #fff;
+}
+
+.step-item {
+    z-index: 10;
+    text-align: center;
+}
+
+#progress {
+  -webkit-appearance:none;
+    position: absolute;
+    width: 95%;
+    z-index: 5;
+    height: 10px;
+    margin-left: 18px;
+    margin-bottom: 18px;
+}
+
+/* to customize progress bar */
+#progress::-webkit-progress-value {
+    background-color: var(--prm-color);
+    transition: .5s ease;
+}
+
+#progress::-webkit-progress-bar {
+    background-color: var(--prm-gray);
+
+}
