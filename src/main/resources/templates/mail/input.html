@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn Chi Nhánh</title>
+    <style>
+        #suggestions {
+            border: 1px solid #ddd;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            background: #fff;
+            width: 200px;
+            list-style-type: none; /* Bỏ dấu chấm trong danh sách */
+            padding: 0; /* Xóa padding */
+            margin: 0; /* Xóa margin */
+            display: none; /* Ẩn gợi ý ban đầu */
+            z-index: 1000; /* Đảm bảo gợi ý hiển thị trên các phần khác */
+        }
+
+        #suggestions li {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        #suggestions li:hover {
+            background-color: #f0f0f0; /* Màu nền khi hover */
+        }
+    </style>
+</head>
+<body>
+
+<input type="text" id="branchInput" placeholder="Chọn chi nhánh" autocomplete="off">
+<input type="hidden" id="branchId" /> <!-- Ô input ẩn để lưu branchId -->
+<ul id="suggestions"></ul> <!-- Sử dụng <ul> để chứa gợi ý -->
+
+<script>
+    async function fetchBranches() {
+        // Giả lập dữ liệu API trả về danh sách chi nhánh
+        return [
+            { branchId: 1, branchName: "Chi nhánh Hà Nội" },
+            { branchId: 2, branchName: "Chi nhánh TP. Hồ Chí Minh" },
+            { branchId: 3, branchName: "Chi nhánh Đà Nẵng" },
+            { branchId: 4, branchName: "Chi nhánh Cần Thơ" },
+            { branchId: 5, branchName: "Chi nhánh Hải Phòng" }
+        ];
+    }
+
+    function filterBranches(query, branches) {
+        // Lọc danh sách chi nhánh theo input của người dùng
+        return branches.filter(branch =>
+            branch.branchName.toLowerCase().includes(query.toLowerCase())
+        );
+    }
+
+    async function displaySuggestions(query) {
+        const branches = await fetchBranches();
+        const filteredBranches = filterBranches(query, branches);
+
+        const suggestionsBox = document.getElementById("suggestions");
+        suggestionsBox.innerHTML = ""; // Xóa các gợi ý cũ
+
+        // Hiển thị danh sách gợi ý
+        filteredBranches.forEach(branch => {
+            const suggestionItem = document.createElement("li");
+            suggestionItem.textContent = branch.branchName;
+            suggestionItem.onclick = function() {
+                // Cập nhật giá trị ô input với branchName và lưu branchId
+                document.getElementById("branchInput").value = branch.branchName;
+                document.getElementById("branchId").value = branch.branchId; // Lưu branchId vào input ẩn
+                suggestionsBox.style.display = "none"; // Ẩn gợi ý khi chọn xong
+            };
+            suggestionsBox.appendChild(suggestionItem);
+        });
+
+        // Hiển thị hoặc ẩn box gợi ý
+        suggestionsBox.style.display = filteredBranches.length ? "block" : "none";
+    }
+
+    // Khi nhấp vào ô input, hiển thị danh sách tất cả chi nhánh
+    document.getElementById("branchInput").addEventListener("click", async function () {
+        await displaySuggestions("");
+    });
+
+    // Khi nhập vào ô input, tìm kiếm chi nhánh
+    document.getElementById("branchInput").addEventListener("input", async function () {
+        const query = this.value;
+        await displaySuggestions(query);
+    });
+</script>
+
+</body>
+</html>
