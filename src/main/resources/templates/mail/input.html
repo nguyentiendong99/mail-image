@@ -1,94 +1,83 @@
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+@Controller
+public class CountdownController {
+    @GetMapping("/countdown")
+    public String countdown(Model model) {
+        // Set initial date (for example: today)
+        Calendar calendar = Calendar.getInstance();
+        
+        // Add 2 working days (skip weekends)
+        int daysToAdd = 2;
+        while (daysToAdd > 0) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY) {
+                daysToAdd--;
+            }
+        }
+
+        // Format the final expiration date to pass as a string
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        model.addAttribute("expirationDate", dateFormat.format(calendar.getTime()));
+        
+        return "countdown";
+    }
+}
+
+
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chọn Chi Nhánh</title>
+    <title>Countdown Timer</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        #suggestions {
-            border: 1px solid #ddd;
-            max-height: 150px;
-            overflow-y: auto;
-            position: absolute;
-            background: #fff;
-            width: 200px;
-            list-style-type: none; /* Bỏ dấu chấm trong danh sách */
-            padding: 0; /* Xóa padding */
-            margin: 0; /* Xóa margin */
-            display: none; /* Ẩn gợi ý ban đầu */
-            z-index: 1000; /* Đảm bảo gợi ý hiển thị trên các phần khác */
-        }
-
-        #suggestions li {
-            padding: 8px;
-            cursor: pointer;
-        }
-
-        #suggestions li:hover {
-            background-color: #f0f0f0; /* Màu nền khi hover */
+        .countdown-container {
+            text-align: center;
+            font-size: 2em;
+            padding: 20px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
+    <div class="countdown-container">
+        <div id="countdown" class="display-4"></div>
+    </div>
 
-<input type="text" id="branchInput" placeholder="Chọn chi nhánh" autocomplete="off">
-<input type="hidden" id="branchId" /> <!-- Ô input ẩn để lưu branchId -->
-<ul id="suggestions"></ul> <!-- Sử dụng <ul> để chứa gợi ý -->
+    <script>
+        // Get the expiration date passed from Spring MVC
+        const expirationDate = new Date("<%= expirationDate %>");
 
-<script>
-    async function fetchBranches() {
-        // Giả lập dữ liệu API trả về danh sách chi nhánh
-        return [
-            { branchId: 1, branchName: "Chi nhánh Hà Nội" },
-            { branchId: 2, branchName: "Chi nhánh TP. Hồ Chí Minh" },
-            { branchId: 3, branchName: "Chi nhánh Đà Nẵng" },
-            { branchId: 4, branchName: "Chi nhánh Cần Thơ" },
-            { branchId: 5, branchName: "Chi nhánh Hải Phòng" }
-        ];
-    }
+        // Update the countdown every 1 second
+        const countdown = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = expirationDate.getTime() - now;
 
-    function filterBranches(query, branches) {
-        // Lọc danh sách chi nhánh theo input của người dùng
-        return branches.filter(branch =>
-            branch.branchName.toLowerCase().includes(query.toLowerCase())
-        );
-    }
+            // Time calculations
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    async function displaySuggestions(query) {
-        const branches = await fetchBranches();
-        const filteredBranches = filterBranches(query, branches);
+            // Display the result
+            document.getElementById("countdown").innerHTML = 
+                days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
 
-        const suggestionsBox = document.getElementById("suggestions");
-        suggestionsBox.innerHTML = ""; // Xóa các gợi ý cũ
-
-        // Hiển thị danh sách gợi ý
-        filteredBranches.forEach(branch => {
-            const suggestionItem = document.createElement("li");
-            suggestionItem.textContent = branch.branchName;
-            suggestionItem.onclick = function() {
-                // Cập nhật giá trị ô input với branchName và lưu branchId
-                document.getElementById("branchInput").value = branch.branchName;
-                document.getElementById("branchId").value = branch.branchId; // Lưu branchId vào input ẩn
-                suggestionsBox.style.display = "none"; // Ẩn gợi ý khi chọn xong
-            };
-            suggestionsBox.appendChild(suggestionItem);
-        });
-
-        // Hiển thị hoặc ẩn box gợi ý
-        suggestionsBox.style.display = filteredBranches.length ? "block" : "none";
-    }
-
-    // Khi nhấp vào ô input, hiển thị danh sách tất cả chi nhánh
-    document.getElementById("branchInput").addEventListener("click", async function () {
-        await displaySuggestions("");
-    });
-
-    // Khi nhập vào ô input, tìm kiếm chi nhánh
-    document.getElementById("branchInput").addEventListener("input", async function () {
-        const query = this.value;
-        await displaySuggestions(query);
-    });
-</script>
-
+            // If the countdown is finished
+            if (distance < 0) {
+                clearInterval(countdown);
+                document.getElementById("countdown").innerHTML = "EXPIRED";
+            }
+        }, 1000);
+    </script>
 </body>
 </html>
