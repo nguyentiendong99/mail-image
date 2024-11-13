@@ -1,155 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 5 Horizontal Stepper Example</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/style.css">
-  </head>
-  <body>
- <main>
-<div class="container">
-<div class="steps">
-    <progress id="progress" value=0 max=100 ></progress>
-    <div class="step-item">
-        <button class="step-button text-center" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-            1
-        </button>
-        <div class="step-title">
-            First Step
-        </div>
-    </div>
-    <div class="step-item">
-        <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-            2
-        </button>
-        <div class="step-title">
-            Second Step
-        </div>
-    </div>
-    <div class="step-item">
-        <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseThree">
-            3
-        </button>
-        <div class="step-title">
-            Third Step
-        </div>
-    </div>
-    <div class="step-item">
-        <button class="step-button text-center collapsed" type="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseFour">
-            4
-        </button>
-        <div class="step-title">
-            Third Step
-        </div>
-    </div>
-</div>
-</div>
-         <!-- End Start Stepper HTML -->
- </main>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
-<script>
-const stepButtons = document.querySelectorAll('.step-button');
-const progress = document.querySelector('#progress');
-
-// Hàm để thiết lập trạng thái của stepper
-function setInitialStep(stepIndex) {
-    progress.setAttribute('value', stepIndex * 100 / (stepButtons.length - 1));
-    stepButtons.forEach((button, index) => {
-        if (index <= stepIndex) {
-            button.classList.add('done');
-        } else {
-            button.classList.remove('done');
+<html>
+<head>
+    <title>Form Submit với Popup</title>
+    <style>
+        /* CSS cho popup */
+        #popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+            max-width: 250px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         }
-    });
-}
+    </style>
+</head>
+<body>
 
-// Gọi hàm khi trang tải xong
-window.onload = () => {
-    setInitialStep(2); // Bắt đầu ở bước 3 (index 2)
-};
+<form:form modelAttribute="yourModelAttribute" action="your_api_endpoint" method="post" onsubmit="return submitForm(this)">
+    <form:input path="dataField" placeholder="Nhập dữ liệu" required="true"/>
+    <button type="submit">Cập nhật</button>
+</form:form>
 
-Array.from(stepButtons).forEach((button,index) => {
-    button.addEventListener('click', () => {
-        progress.setAttribute('value', index * 100 /(stepButtons.length - 1) );
-        stepButtons.forEach((item, secindex)=>{
-            if(index > secindex){
-                item.classList.add('done');
+<script>
+    function submitForm(form) {
+        event.preventDefault(); // Ngăn chặn submit mặc định
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", form.action, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                var popup = document.createElement("div");
+                popup.id = "popup";
+                
+                // Kiểm tra phản hồi từ API
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.status === "success") {
+                        popup.style.backgroundColor = "green";
+                        popup.innerHTML = "Cập nhật thành công!";
+                        document.body.appendChild(popup);
+
+                        // Sau 3 giây, tắt popup và chuyển hướng
+                        setTimeout(function() {
+                            document.body.removeChild(popup);
+                            window.location.href = "/trang-dich"; // URL của trang đích khi thành công
+                        }, 3000);
+                    } else {
+                        popup.style.backgroundColor = "red";
+                        popup.innerHTML = "Cập nhật thất bại!";
+                        document.body.appendChild(popup);
+
+                        // Tắt popup sau 3 giây mà không chuyển hướng
+                        setTimeout(function() {
+                            document.body.removeChild(popup);
+                        }, 3000);
+                    }
+                } else {
+                    // Xử lý trường hợp lỗi mạng hoặc server
+                    popup.style.backgroundColor = "red";
+                    popup.innerHTML = "Có lỗi xảy ra!";
+                    document.body.appendChild(popup);
+
+                    setTimeout(function() {
+                        document.body.removeChild(popup);
+                    }, 3000);
+                }
             }
-            if(index < secindex){
-                item.classList.remove('done');
-            }
-        })
-    })
-})
+        };
+
+        // Gửi dữ liệu từ form dưới dạng chuỗi URL
+        var formData = new FormData(form);
+        var params = new URLSearchParams(formData).toString();
+        xhr.send(params);
+
+        return false; // Ngăn form submit truyền thống
+    }
 </script>
-  </body>
+
+</body>
 </html>
-
-
-:root {
-    --prm-color: #0381ff;
-    --prm-gray: #b1b1b1;
-}
-
-/* CSS */
-.steps {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    position: relative;
-}
-
-.step-button {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: none;
-    background-color: var(--prm-gray);
-    transition: .4s;
-}
-
-.step-button[aria-expanded="true"] {
-    width: 60px;
-    height: 60px;
-    background-color: var(--prm-color);
-    color: #fff;
-}
-
-.done {
-    background-color: var(--prm-color);
-    color: #fff;
-}
-
-.step-item {
-    z-index: 10;
-    text-align: center;
-}
-
-#progress {
-  -webkit-appearance:none;
-    position: absolute;
-    width: 95%;
-    z-index: 5;
-    height: 10px;
-    margin-left: 18px;
-    margin-bottom: 18px;
-}
-
-/* to customize progress bar */
-#progress::-webkit-progress-value {
-    background-color: var(--prm-color);
-    transition: .5s ease;
-}
-
-#progress::-webkit-progress-bar {
-    background-color: var(--prm-gray);
-
-}
